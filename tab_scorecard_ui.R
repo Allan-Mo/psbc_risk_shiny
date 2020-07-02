@@ -1,0 +1,1 @@
+tab_scorecard_ui <- tabPanel(title="模型",value="scorecard")

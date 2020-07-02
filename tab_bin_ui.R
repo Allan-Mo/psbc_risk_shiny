@@ -1,0 +1,1 @@
+tab_bin_ui <- tabPanel(title="分箱",value="bin")

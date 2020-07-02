@@ -1,0 +1,17 @@
+.navbar-nav > li > a, .navbar-brand
+    {
+      padding-top:4px;
+      padding-bottom:0;
+      height: 30px;
+    }
+    .navbar
+    {
+      min-height:30px
+    }
+    .row,
+    .well
+    {
+      padding-top:2px;
+      padding-bottom:0;
+
+.inline label{ display: table-cell; text-align: left; vertical-align: middle; } .inline .form-group{display: table-row;}
