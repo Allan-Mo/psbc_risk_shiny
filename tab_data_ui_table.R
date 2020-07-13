@@ -1,5 +1,6 @@
 
 
+
 tab_data_ui_table_rdo <- radioButtons(
   "tab_data_rdo_tbltype",
   label = NULL,
@@ -22,7 +23,8 @@ tab_data_ui_table_cond1 <-
                      
                    ),
                    column(
-                     8, verbatimTextOutput("tab_data_text_tbl_single",placeholder = TRUE)
+                     8,
+                     verbatimTextOutput("tab_data_text_tbl_single", placeholder = TRUE)
                    )))
 tab_data_ui_table_cond2 <-
   conditionalPanel(
@@ -37,7 +39,8 @@ tab_data_ui_table_cond2 <-
       )
     )
     , column(
-      8, verbatimTextOutput("tab_data_text_tbl_train",placeholder = TRUE)
+      8,
+      verbatimTextOutput("tab_data_text_tbl_train", placeholder = TRUE)
     )),
     fluidRow(column(
       4,
@@ -48,9 +51,10 @@ tab_data_ui_table_cond2 <-
         multiple = FALSE
       )
     )
-    , column(8, verbatimTextOutput(
-      "tab_data_text_tbl_test",placeholder = TRUE
-    ))),
+    , column(
+      8,
+      verbatimTextOutput("tab_data_text_tbl_test", placeholder = TRUE)
+    )),
     fluidRow(column(
       4,
       shinyFilesButton(
@@ -61,48 +65,36 @@ tab_data_ui_table_cond2 <-
       )
     )
     , column(
-      8, verbatimTextOutput("tab_data_text_tbl_validate",placeholder = TRUE)
+      8,
+      verbatimTextOutput("tab_data_text_tbl_validate", placeholder = TRUE)
     ))
   )
 
 
 
-tab_data_ui_table1 <- fluidRow(
+tab_data_ui_table <- fluidRow(
   column(
-    4,
+    3,
     tab_data_ui_table_rdo,
     tab_data_ui_table_cond1,
     tab_data_ui_table_cond2 ,
-    fluidRow(column(6,actionButton("tab_data_btn_load_allfile", "load所有")),
-             column(6,actionButton("tab_data_btn_load_file", "load文件")))
-  ),
-  column(5, dataTableOutput("tab_data_tbl_stat")),
-  column(3,plotlyOutput("tab_data_tbl_plot"))
-)
-tab_data_ui_table2 <- fluidRow(
-  
-  
-  column(
-    1,
-    shinyFilesButton(
-      "tab_data_btn_special",
-      "特殊值",
-      title = NULL,
-      multiple = FALSE
-    )
-  ),
-  column(2, verbatimTextOutput("tab_data_text_special",placeholder = TRUE)),
-  column(2, verbatimTextOutput("tab_data_text_special_time",placeholder = TRUE)),
-  column(
-    1,
-    shinyFilesButton(
-      "tab_data_btn_setting",
+    fluidRow(column(12,actionButton("tab_data_btn_load_alltable", "load数据"))),
+    hr(),
+    fluidRow(column(4,shinyFilesButton(
+      "tab_data_btn_tbl_setting",
       "参数文件",
       title = NULL,
       multiple = FALSE
-    )
+    )),
+             column(8,verbatimTextOutput("tab_data_text_tbl_setting", placeholder = TRUE))),
+    fluidRow(column(4,actionButton("tab_data_btn_load_setting", "load参数文件"))),
+    hr(),
+    fluidRow(column(4,actionButton("tab_data_btn_load_allfile", "load所有")),
+             column(4,actionButton("tab_data_btn_cancel_allfile", "清除选择")),
+             column(4,actionButton("tab_data_table_tbn_confirm_all_remove","删除数据")))
+    
   ),
-  column(2, verbatimTextOutput("tab_data_text_setting",placeholder = TRUE)),
-  column(2, verbatimTextOutput("tab_data_text_setting_time",placeholder = TRUE)),
-  column(2,actionButton("tab_data_btn_special_view","查看特殊值"))
+  column(5,
+         dataTableOutput("tab_data_tbl_stat")),
+  column(4, plotlyOutput("tab_data_tbl_plot"))
 )

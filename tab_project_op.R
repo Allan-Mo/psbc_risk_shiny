@@ -3,21 +3,28 @@
 # 项目表 -----------------------------------------------------------------------
 
 output$tab_project_table <- DT::renderDT({
-  ra_config$df_project %>%
+  ra_config$tbl_project %>%
     DT::datatable(
       selection = "single",
       rownames = FALSE,
-      options = list(lengthChange = TRUE)
+      options = list(lengthChange = TRUE,orderClasses = TRUE)
     )
 },
 server = TRUE)
 
 # 响应从表中选择行 --------------------------------------------------------------------
 ra_project_select_record <- reactive({
-  ra_config$df_project[input$tab_project_table_rows_selected, ]
+  if (!is.null(input$tab_project_table_rows_selected)) {
+    my_log("DEBUG",ra_config$debug_level,"select row",input$tab_project_table_rows_selected)
+  }
+  
+  ra_config$tbl_project[input$tab_project_table_rows_selected, ]
 })
 
 output$tab_project_text_select <- renderPrint({
+  if (is.null(ra_project_select_record())) {
+    return()
+  }
   s = ra_project_select_record()
   if (nrow(s) > 0) {
     cat(sprintf('是否选择第%s个项目:%s', s$id[1], s$name_cn[1]))
@@ -32,48 +39,24 @@ output$tab_project_text_select <- renderPrint({
 # 响应选择项目 ------------------------------------------------------------------
 
 observeEvent(input$tab_project_btn_select, {
+  my_log("INFO",ra_config$debug_level,"button click - select project")
+  # 显示tab
+  show(selector = '#navbar li a[data-value="data"]')
+  show(selector = '#navbar li a[data-value="setting"]')
+  show(selector = '#navbar li a[data-value="bin"]')
+  show(selector = '#navbar li a[data-value="var"]')
+  show(selector = '#navbar li a[data-value="psi"]')
+  show(selector = '#navbar li a[data-value="scorecard"]')
+  show(selector = '#navbar li a[data-value="ml"]')
+  show(selector = '#navbar li a[data-value="report"]')
   s <- ra_project_select_record()
   if (nrow(s) > 0) {
     s <- as.list(unlist(s))
     # 写入config
     ra_config$select_project <- s
-    # 加载project数据
-    file <- path(s$path, "project.Rdata")
-    if (file.exists(file)) {
-      load(file)
-      for (name in names(project)) {
-        ra_project[[name]] <- project[[name]]
-      }
-    }
-    # 空表结构
-    if (is.null(ra_project$tbl_stat)) {
-      ra_project$tbl_stat <- psbc_risk_template$tbl_stat
-    }
-    
-    if (is.null(ra_project$tbl_mutate)) {
-      ra_project$tbl_mutate <- psbc_risk_template$mutate
-    }
-    if (is.null(ra_project$tbl_varstat)) {
-      ra_project$tbl_varstat <- psbc_risk_template$varstat
-    }
-    # 模板文件
-    if (is.null(ra_project$file_special)) {
-      relative_file <- "/特殊值_模板.txt"
-      file <- path(ra_config$select_project$path, relative_file)
-      psbc_risk_template$special %>% 
-        write.table(file,row.names=FALSE,quote=FALSE,col.names = FALSE)
-      ra_project$special_values <- list(values=psbc_risk_template$special,dt=Sys.time())
-      ra_project$file_special <- relative_file
-    if (is.null(ra_project$file_setting)) {
-      relative_file <- "/参数文件_模板.xlsx"
-      file <- path(ra_config$select_project$path, relative_file)
-      
-    }
-      
-        
-      
-      
-    }
+    # project数据初始化
+    my_log("DEBUG",ra_config$debug_level,"project initiating")
+    source("tab_project_op_init.R",local=TRUE,encoding = "UTF-8")
     
   }
   
@@ -87,12 +70,6 @@ output$tab_project_text_current <- renderPrint({
   }
 })
 
-# 显示tab
-observeEvent(input$tab_project_btn_select, {
-  show(selector = '#navbar li a[data-value="data"]')
-  show(selector = '#navbar li a[data-value="bin"]')
-  show(selector = '#navbar li a[data-value="scorecard"]')
-})
 
 
 
@@ -104,7 +81,7 @@ observeEvent(input$tab_project_btn_select, {
 #   tab_project_op_proxy %>%
 #     addRow(
 #       list(
-#         id = nrow(config$df_project) + 1,
+#         id = nrow(config$tbl_project) + 1,
 #         name = input$tab_project_add_name,
 #         name_cn = input$tab_project_add_name_cn,
 #         owner = "莫运政",
@@ -141,8 +118,8 @@ observeEvent(input$tab_project_btn_add, {
       footer = tagList(modalButton("返回修改"))
     ))
   } else {
-    ra_config$df_project <- data.frame(
-      id = nrow(ra_config$df_project) + 1,
+    ra_config$tbl_project <- data.frame(
+      id = nrow(ra_config$tbl_project) + 1,
       name = input$tab_project_add_name,
       name_cn = input$tab_project_add_name_cn,
       owner = input$tab_project_add_owner,
@@ -150,8 +127,16 @@ observeEvent(input$tab_project_btn_add, {
       modify_time = Sys.time(),
       path = path
     ) %>%
-      bind_rows(ra_config$df_project)
+      bind_rows(ra_config$tbl_project)
   }
   
   
 })
+
+
+# log ---------------------------------------------------------------------
+
+observeEvent(input$tab_project_select_debug,{
+  ra_config$debug_level <- input$tab_project_select_debug
+})
+

@@ -5,32 +5,38 @@ path <- "D:\\OneDrive\\R_packages\\psbc_risk_shiny"
 setwd(path)
 options(shiny.reactlog=TRUE)
 # library -----------------------------------------------------------------
-
-
 library(shiny)
 library(shinyFiles)
 library(shinyjs)
 library(shinyBS)
-library(dplyr)
 library(DT)
+library(tidyverse)
+library(readxl)
 library(fs)
 library(logging)
 library(scorecard)
 library(tools)
 library(openxlsx)
-library(stringr)
 library(plotly)
+library(rlang)
+library(data.table)
 # config object -----------------------------------------------------------
-source("config.R", encoding = "UTF-8")
-source("tooltips_ui.R", encoding = "UTF-8")
+for (file in list.files("functions",full.names=TRUE)) {
+    source(file,local=TRUE, encoding = "UTF-8")
+}
+source("config.R",local=TRUE, encoding = "UTF-8")
+source("tooltips_ui.R",local=TRUE, encoding = "UTF-8")
 # UI ----------------------------------------------------------------------
 # source navbar's tabPanel
-source("tab_project_ui.R", encoding = "UTF-8") #项目
-source("tab_data_ui.R", encoding = "UTF-8") #数据
-source("tab_var_ui.R", encoding = "UTF-8") #变量
-source("tab_psi_ui.R", encoding = "UTF-8") #PSI
-source("tab_bin_ui.R", encoding = "UTF-8") #项目
-source("tab_scorecard_ui.R", encoding = "UTF-8") #评分卡
+source("tab_project_ui.R",local=TRUE, encoding = "UTF-8") 
+source("tab_data_ui.R",local=TRUE, encoding = "UTF-8")
+source("tab_setting_ui.R",local=TRUE, encoding = "UTF-8")
+source("tab_var_ui.R",local=TRUE, encoding = "UTF-8")
+source("tab_psi_ui.R",local=TRUE, encoding = "UTF-8") 
+source("tab_bin_ui.R",local=TRUE, encoding = "UTF-8")
+source("tab_ml_ui.R",local=TRUE, encoding = "UTF-8")
+source("tab_report_ui.R",local=TRUE, encoding = "UTF-8")
+source("tab_scorecard_ui.R",local=TRUE, encoding = "UTF-8")
 
 
 
@@ -42,16 +48,21 @@ ui <- tagList(
         tags$style(type="text/css", ".inline label{ display: table-cell; text-align: left; vertical-align: middle; } 
                  .inline .form-group{display: table-row;}")
     ),
+    tags$style(type="text/css", "body {padding-top: 35px;}"),
     navbarPage(
         "风险管理部",
         tab_project_ui,
         tab_data_ui,
+        tab_setting_ui,
         tab_var_ui,
-        tab_psi_ui,
         tab_bin_ui,
         tab_scorecard_ui,
+        tab_psi_ui,
+        tab_ml_ui,
+        tab_report_ui,
         tooltips_taglist,
-        id = "navbar"
+        id = "navbar",
+        position="fixed-top"
     )
 )
 
@@ -65,7 +76,16 @@ server <- function(input, output, session) {
     source("tab_data_op.R",
            local = T,
            encoding = "UTF-8")
-    source("tooltips_op.R", local = T, encoding = "UTF-8") # conditionPanel必须在server中加tooltips
+    source("tab_setting_op.R",
+           local = T,
+           encoding = "UTF-8")
+    source("tab_var_op.R",
+           local = T,
+           encoding = "UTF-8")
+    source("tab_bin_op.R",
+           local = T,
+           encoding = "UTF-8")
+    source("tooltips_op.R", local = T, encoding = "UTF-8") # conditionPanel cannot addtooltips by ui?
 }
 
 # Run the application
